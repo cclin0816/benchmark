@@ -43,9 +43,10 @@ template <typename Fn, typename... Args>
 using invoke_r_t = typename std::result_of<Fn(Args...)>::type;
 #endif
 
-// nodiscard attribute for c++ 17 and 20
+// attribute for c++ 17 and 20
 #if __cplusplus >= 201703L
 #define NODISCARD [[nodiscard]]
+#define MAYBE_UNUSED [[maybe_unused]]
 #else
 #define NODISCARD
 #endif
@@ -62,7 +63,7 @@ using tp = cn::time_point<cn::steady_clock, nanos>;
  * @brief empty function for function hook
  *
  */
-[[maybe_unused]] void empty_fn() {}
+MAYBE_UNUSED void empty_fn() {}
 
 /**
  * @brief similiar to std::chrono::steady_clock::now but with
