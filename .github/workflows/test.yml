@@ -27,6 +27,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y g++-11 clang++-12
+          sudo apt-get install -y libc6
           clang++-12 --version
           g++-11 --version
 

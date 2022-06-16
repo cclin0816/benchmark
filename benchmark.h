@@ -49,6 +49,7 @@ using invoke_r_t = typename std::result_of<Fn(Args...)>::type;
 #define MAYBE_UNUSED [[maybe_unused]]
 #else
 #define NODISCARD
+#define MAYBE_UNUSED
 #endif
 
 // alias for std::chrono
