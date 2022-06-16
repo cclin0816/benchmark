@@ -1,12 +1,8 @@
 name: test
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  push: {}
+  pull_request: {}
 
 jobs:
   test-bindings:
@@ -31,4 +27,3 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/test
         run: make
-        
