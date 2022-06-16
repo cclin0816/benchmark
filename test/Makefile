@@ -5,3 +5,4 @@ all:
 
 test:
 	@echo "test"
+	exit 1
