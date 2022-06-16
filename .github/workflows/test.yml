@@ -12,8 +12,8 @@ jobs:
       fail-fast: true
       matrix:
         compiler:
-          - "g++-10"
-          - "clang++-10"
+          - "g++-11"
+          - "clang++-12"
         standard:
           - "c++11"
           - "c++20"
@@ -26,8 +26,7 @@ jobs:
         # run: sudo apt-get update -y && sudo apt-get install -y gcc-11 clang-12
         run: |
           sudo apt-get update -y
-          sudo apt-get upgrade -y
-          sudo apt-get install -y g++-10 clang++-10
+          sudo apt-get install -y g++-11 clang++-12
 
       - name: build
         env:
