@@ -1,0 +1,44 @@
+name: test
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  test-bindings:
+    name: test-bindings
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        compiler:
+          - "g++-11"
+          - "clang++-12"
+        standard:
+          - "c++11"
+          - "c++20"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install-deps
+        shell: bash
+        # run: sudo apt-get update -y && sudo apt-get install -y gcc-11 clang-12
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y g++-11 clang++-12
+          clang++-12 --version
+          gcc++-11 --version
+
+      - name: build
+        env:
+          CXX: ${{ matrix.compiler }}
+          CXXSTD: ${{ matrix.standard }}
+        shell: bash
+        working-directory: ${{ github.workspace }}/test
+        run: make
+
+      - name: test
+        shell: bash
+        working-directory: ${{ github.workspace }}/test
+        run: make test
