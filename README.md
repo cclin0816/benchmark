@@ -1,6 +1,6 @@
 # Benchmark
 
-![test](https://github.com/cclin0816/benchmark/actions/workflows/test/badge.svg)
+![test](https://github.com/cclin0816/benchmark/actions/workflows/test.yml/badge.svg)
 
 ## Usage
 

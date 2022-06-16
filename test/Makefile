@@ -2,4 +2,6 @@
 
 all:
 	@echo "all"
-	exit 1
+
+test:
+	@echo "test"
