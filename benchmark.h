@@ -1,22 +1,32 @@
+/**
+ * @file benchmark.h
+ * @author cclin0816 (github.com/cclin0816)
+ * @brief pleas refer to github.com/cclin0816/benchmark for more information
+ * @version 1.0
+ * @date 2022-06-17
+ *
+ * @copyright MIT License, Copyright (c) 2022 cclin0816
+ */
+
+#if defined(__linux__)
 #include <time.h>
+#endif
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
-// #include <concepts>
 #include <cstdint>
 #include <functional>
 #include <numeric>
 #include <random>
-// #include <span>
-#include <array>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace bm {
 
-inline namespace v1 {
+inline namespace v1_0 {
 
 // is_same type trait, using this for compatibility reasons
 template <typename Tp, typename... Rest>
@@ -66,6 +76,7 @@ using tp = cn::time_point<cn::steady_clock, nanos>;
  */
 MAYBE_UNUSED void empty_fn() {}
 
+#if defined(__linux__)
 /**
  * @brief similiar to std::chrono::steady_clock::now but with
  * processing time (user + system)
@@ -76,6 +87,7 @@ NODISCARD tp proc_time_now() {
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
   return tp(nanos(ts.tv_nsec) + secs(ts.tv_sec));
 }
+#endif
 
 /**
  * @brief difference between two time points
@@ -100,10 +112,10 @@ NODISCARD nanos tp_diff(const tp& start, const tp& end) {
  */
 template <typename T_VAL, typename T_DIFF>
 NODISCARD T_DIFF time(std::function<T_VAL()> now,
-                          std::function<T_DIFF(T_VAL, T_VAL)> diff,
-                          std::function<void()> func,
-                          std::function<void()> pre_func,
-                          std::function<void()> post_func) {
+                      std::function<T_DIFF(T_VAL, T_VAL)> diff,
+                      std::function<void()> func,
+                      std::function<void()> pre_func,
+                      std::function<void()> post_func) {
   pre_func();
   auto start = now();
   func();
@@ -121,8 +133,8 @@ NODISCARD T_DIFF time(std::function<T_VAL()> now,
  * @return timing function
  */
 NODISCARD auto real_time(std::function<void()> func,
-                             std::function<void()> pre_func = empty_fn,
-                             std::function<void()> post_func = empty_fn)
+                         std::function<void()> pre_func = empty_fn,
+                         std::function<void()> post_func = empty_fn)
     -> decltype(std::bind(time<tp, nanos>, cn::steady_clock::now, tp_diff, func,
                           pre_func, post_func)) {
   return std::bind(time<tp, nanos>, cn::steady_clock::now, tp_diff, func,
@@ -138,8 +150,8 @@ NODISCARD auto real_time(std::function<void()> func,
  * @return timing function
  */
 NODISCARD auto proc_time(std::function<void()> func,
-                             std::function<void()> pre_func = empty_fn,
-                             std::function<void()> post_func = empty_fn)
+                         std::function<void()> pre_func = empty_fn,
+                         std::function<void()> post_func = empty_fn)
     -> decltype(std::bind(time<tp, nanos>, proc_time_now, tp_diff, func,
                           pre_func, post_func)) {
   return std::bind(time<tp, nanos>, proc_time_now, tp_diff, func, pre_func,
@@ -314,9 +326,9 @@ std::pair<T, double> avg_stddev(const std::vector<T>& vec) {
 
 // exclude_avg helper
 template <typename T, uint64_t N>
-T excl_avg(const std::vector<T>& vec) {
+T excl_avg(std::vector<T>& vec) {
   if (N * 2 >= vec.size()) {
-    return median(vec);
+    return median<T>(vec);
   }
   std::vector<T> excl_vec(vec.begin() + N, vec.end() - N);
   return avg(excl_vec);
@@ -328,6 +340,6 @@ std::vector<T> full(const std::vector<T>& vec) {
   return vec;
 }
 
-}  // namespace v1
+}  // namespace v1_0
 
-}  // namespace bp
+}  // namespace bm
