@@ -8,8 +8,10 @@
  * @copyright MIT License, Copyright (c) 2022 cclin0816
  */
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__unix__)
 #include <time.h>
+#elif defined(_WIN32)
+#include <windows.h>
 #endif
 
 #include <algorithm>
@@ -76,18 +78,32 @@ using tp = cn::time_point<cn::steady_clock, nanos>;
  */
 MAYBE_UNUSED void empty_fn() {}
 
-#if defined(__linux__)
 /**
  * @brief similiar to std::chrono::steady_clock::now but with
  * processing time (user + system)
  *
  */
 NODISCARD tp proc_time_now() {
+#if defined(__linux__) || defined(__unix__)
+
   timespec ts;
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
   return tp(nanos(ts.tv_nsec) + secs(ts.tv_sec));
-}
+
+#elif defined(_WIN32)
+
+  FILETIME creation, exit, kernel, user;
+  GetProcessTimes(GetCurrentProcess(), &creation, &exit, &kernel, &user);
+  uint64_t user_time =
+      ((((uint64_t)user.dwHighDateTime) << 32) | (uint64_t)user.dwLowDateTime) *
+      100UL;
+  uint64_t kernel_time = ((((uint64_t)kernel.dwHighDateTime) << 32) |
+                          (uint64_t)kernel.dwLowDateTime) *
+                         100UL;
+  return tp(nanos(user_time + kernel_time));
+
 #endif
+}
 
 /**
  * @brief difference between two time points
@@ -301,7 +317,7 @@ double nsd(const std::vector<T>& vec) {
                                 const auto diff = val - _avg;
                                 return acc + diff * diff;
                               });
-  return sqrtl((double)_sum / vec.size());
+  return sqrtl((double)_sum / vec.size()) / _avg;
 }
 
 // normalized standard deviation helper
@@ -318,7 +334,7 @@ double nsd(const std::vector<nanos>& vec) {
 
 // avg_nsd helper
 template <typename T>
-std::pair<T, double> avg_stddev(const std::vector<T>& vec) {
+std::pair<T, double> avg_nsd(const std::vector<T>& vec) {
   auto _avg = avg(vec);
   auto _dev = nsd(vec);
   return std::make_pair(_avg, _dev);

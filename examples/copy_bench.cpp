@@ -171,6 +171,8 @@ uint64_t powul(const uint64_t base, uint64_t exp) {
 }
 
 int main() {
+
+  // create bench target
   auto buf_1k =
       bm::real_time(buf_cp<1 * KiB>, std::bind(pre_cp, "buf_1k_cp"), post_cp);
   auto buf_32k =
@@ -189,6 +191,7 @@ int main() {
       copy_file_range_cp, std::bind(pre_cp, "copy_file_range_cp"), post_cp);
   auto cp_bench = bm::real_time(cp_cp, std::bind(pre_cp, "cp_cp"), post_cp);
 
+  // benchmark and output csv
   std::ofstream ofs("benchmark.csv");
   ofs << ",buf_1k_cp,buf_32k_cp,buf_1m_cp,buf_32m_cp,buf_1g_cp,mmap_cp,"
          "sendfile_cp,copy_file_range_cp,cp_cp"
@@ -196,8 +199,8 @@ int main() {
   for (auto i = 0UL; i < 5UL; i++) {
     auto src_size = powul(32, i) * 1024;
     gen_rd_src(src_size);
-
     ofs << src_size << std::flush;
+    
     auto res = bm::bench(5UL, bm::excl_avg<bm::nanos, 1>, buf_1k, buf_32k,
                          buf_1m, buf_32m, buf_1g, mmap_bench, sendfile_bench,
                          copy_file_range_bench, cp_bench);
